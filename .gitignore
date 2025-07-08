@@ -1,0 +1,81 @@
+# ======================
+# CMake 生成文件和构建目录
+# ======================
+# 构建目录（外部构建）
+/build/
+/out/
+/CMakeCache.txt
+/CMakeFiles/
+/CMakeScripts/
+/cmake_install.cmake
+/install_manifest.txt
+/*.cmake
+/Makefile
+/*.ninja
+/.ninja_deps
+/.ninja_log
+
+# ======================
+# 编译生成文件和二进制
+# ======================
+# 可执行文件和库
+/bin/
+/lib/
+/*.exe
+/*.a
+/*.so
+/*.dylib
+/*.dll
+/*.lib
+/*.exp
+/*.ilk
+/*.pdb
+
+# ======================
+# IDE 和编辑器配置
+# ======================
+# Visual Studio
+/.vs/
+/*.vcxproj
+/*.vcxproj.filters
+/*.sln
+/*.suo
+/x64/
+/Win32/
+
+# CLion
+/.idea/
+/cmake-build-*/
+
+# VSCode
+/.vscode/
+/.history/
+
+# Xcode
+/xcuserdata/
+/*.xcodeproj/
+/*.xcworkspace/
+
+# ======================
+# 临时文件和日志
+# ======================
+/*.log
+/*.tmp
+/*.swp
+/*.user
+/*.ncb
+/*.sdf
+
+# ======================
+# 系统文件（macOS/Windows）
+# ======================
+# macOS
+.DS_Store
+._*
+
+# Windows
+Thumbs.db
+Desktop.ini
+
+# 解压目录
+/deps/src/libdatachannel-0.23.1
