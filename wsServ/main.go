@@ -54,7 +54,8 @@ type RegisterFileReplyMsgPayload struct {
 }
 
 type QueryPeerMsgPayload struct {
-	FileId uint64 `json:"fid"`
+	FileId    uint64 `json:"fid"`
+	IsWebPeer bool   `json:"isWebPeer"`
 }
 
 type QueryPeerReplyMsgPayload struct {
@@ -116,17 +117,46 @@ func NewPeer(c *Center, id uint64) *Peer {
 	return p
 }
 
-func (p *Peer) GetSdp(ufrag, pwd string, passive bool) string {
+func (p *Peer) GetSdp(ufrag, pwd string, passive, isWebPeer bool) string {
 	p.mtx.Lock()
 	sdp := p.sdp
 	p.mtx.Unlock()
+	if isWebPeer {
+		return sdp
+	}
+	if len(sdp) > 0 {
+		items := strings.Split(sdp, "\r\n")
+		filled := false
+		n := 0
+		for i, item := range items {
+			if strings.HasPrefix(item, "a=setup:") ||
+				strings.HasPrefix(item, "a=ice-ufrag:") ||
+				strings.HasPrefix(item, "a=ice-pwd:") {
+				if !filled {
+					filled = true
+					items[n] = SdpPlaceHolder
+					n++
+				}
+			} else if strings.TrimSpace(item) != "" {
+				if i != n {
+					items[n] = item
+				}
+				n++
+			}
+		}
+		items = items[:n]
+		sdp = strings.Join(items, "\r\n")
+	}
 	s := "a=setup:actpass\r\n"
 	if !passive {
 		s = "a=setup:active\r\n"
 	}
 	s += "a=ice-ufrag:" + ufrag + "\r\n"
-	s += "a=ice-pwd:" + pwd + "\r\n"
+	s += "a=ice-pwd:" + pwd
 	sdp = strings.Replace(sdp, SdpPlaceHolder, s, 1)
+	if !strings.HasSuffix(sdp, "\r\n") {
+		sdp += "\r\n"
+	}
 	return sdp
 }
 
@@ -139,10 +169,10 @@ func (p *Peer) Handle(conn *websocket.Conn) {
 		for {
 			messageType, message, err := conn.ReadMessage()
 			if err != nil {
-				slog.Info("读取消息出错:", "err",err)             
+				slog.Info("读取消息出错:", "err", err)
 				break
 			}
-			slog.Info("收到消息：", "msg", message, "type", messageType) 
+			slog.Info("收到消息：", "msg", message, "type", messageType)
 			p.recvCh <- message
 		}
 	}()
@@ -190,32 +220,9 @@ func (p *Peer) handleRegisterSdp(conn *websocket.Conn, msg WrapMsg) {
 		slog.Warn("invalid register message")
 		return
 	}
-	if len(payload.Sdp) > 0 {
-		items := strings.Split(payload.Sdp, "\r\n")
-		filled := false
-		n := 0
-		for i, item := range items {
-			if strings.HasPrefix(item, "a=setup:") ||
-				strings.HasPrefix(item, "a=ice-ufrag:") ||
-				strings.HasPrefix(item, "a=ice-pwd:") {
-				if !filled {
-					filled = true
-					items[n] = SdpPlaceHolder
-					n += 1
-				}
-			} else {
-				if i != n {
-					items[n] = item
-				}
-				n += 1
-			}
-		}
-		items = items[:n]
-		sdp := strings.Join(items, "\r\n")
-		p.mtx.Lock()
-		defer p.mtx.Unlock()
-		p.sdp = sdp
-	}
+
+	p.sdp = payload.Sdp
+
 	reply := WrapReply{
 		Type: MsgTypeRegisterSdpReply,
 		Id:   msg.Id,
@@ -225,7 +232,6 @@ func (p *Peer) handleRegisterSdp(conn *websocket.Conn, msg WrapMsg) {
 	}
 	dat, _ := json.Marshal(reply)
 	conn.WriteMessage(websocket.TextMessage, dat)
-	return
 }
 
 func (p *Peer) handleRegisterFile(conn *websocket.Conn, msg WrapMsg) {
@@ -292,7 +298,7 @@ func NewCenter() (c *Center) {
 func (c *Center) handleWebSocket(w http.ResponseWriter, r *http.Request) {
 	conn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
-		slog.Error("升级失败:", "err",err)         
+		slog.Error("升级失败:", "err", err)
 		return
 	}
 	defer conn.Close()
@@ -360,7 +366,7 @@ func (c *Center) schedulePeer(peerId uint64, payload QueryPeerMsgPayload) (res *
 		Name:      f.Name,
 		Size:      f.Size,
 		Mode:      f.Mode,
-		RemoteSdp: p.GetSdp(ufrag1, pwd1, false),
+		RemoteSdp: p.GetSdp(ufrag1, pwd1, false, false),
 		PeerId:    p.Id,
 	}
 	ask := &QueryPeerAskMsgPayload{
@@ -368,7 +374,7 @@ func (c *Center) schedulePeer(peerId uint64, payload QueryPeerMsgPayload) (res *
 		Ufrag:     ufrag1,
 		Pwd:       pwd1,
 		FileId:    f.FileId,
-		RemoteSdp: u.GetSdp(ufrag0, pwd0, true),
+		RemoteSdp: u.GetSdp(ufrag0, pwd0, true, payload.IsWebPeer),
 		PeerId:    peerId,
 	}
 	var reply WrapReply

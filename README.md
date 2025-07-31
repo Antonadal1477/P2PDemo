@@ -7,6 +7,9 @@ signaling server
 ## client
 a p2p demo client
 
+## web
+a p2p web demo client
+
 ## Build
 
 ```bash

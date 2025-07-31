@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebRTC 文件接收器</title>
+    <link rel="stylesheet" href="css/p2p.css">
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <h1>WebRTC 文件接收器</h1>
+            <p class="subtitle">通过P2P技术从C++客户端接收文件</p>
+        </header>
+
+        <div class="main-content">
+            <div class="panel">
+                <h2>连接设置</h2>
+                <div class="form-group">
+                    <label for="serverUrl">信令服务器地址</label>
+                    <input type="text" id="serverUrl" value="ws://localhost:6180/ws" placeholder="输入WebSocket服务器地址">
+                </div>
+
+                <div class="form-group">
+                    <label for="fileId">文件ID</label>
+                    <input type="text" id="fileId" placeholder="输入要接收的文件ID">
+                </div>
+
+                <button id="connectBtn" class="btn">连接服务器</button>
+                <button id="startBtn" class="btn btn-success" disabled>开始接收文件</button>
+                <button id="disconnectBtn" class="btn btn-danger" disabled>断开连接</button>
+
+                <div class="connection-status">
+                    <div class="status-indicator" id="statusIndicator"></div>
+                    <span id="statusText">未连接</span>
+                </div>
+            </div>
+
+            <div class="panel">
+                <h2>传输状态</h2>
+                <div class="progress-container">
+                    <div class="progress-header">
+                        <span>传输进度</span>
+                        <span id="progressPercent">0%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill"></div>
+                    </div>
+                    <div class="file-info">
+                        <span id="fileName">未选择文件</span>
+                        <span id="fileSize">0 B</span>
+                    </div>
+                    <div class="speed-info">
+                        <span>传输速度:</span>
+                        <span id="transferSpeed">0 KB/s</span>
+                    </div>
+                    <div class="speed-info">
+                        <span>已接收:</span>
+                        <span id="receivedSize">0 B</span>
+                    </div>
+                </div>
+
+                <button id="downloadBtn" class="btn btn-success download-btn">下载文件</button>
+
+                <div class="status-box" id="statusBox">
+                    <div class="status-item info">等待连接...</div>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <p>基于WebRTC技术的P2P文件传输系统 | 信令服务器: Go | 发送端: C++ | 接收端: JavaScript</p>
+        </footer>
+    </div>
+
+    <script src="js/p2p.js"></script>
+</body>
+
+</html>

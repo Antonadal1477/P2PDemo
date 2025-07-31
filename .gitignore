@@ -79,3 +79,6 @@ Desktop.ini
 
 # 解压目录
 /deps/src/libdatachannel-0.23.1
+
+# go vendor
+**/vendor
