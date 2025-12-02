@@ -395,7 +395,7 @@ void P2PTransfer::handleAsk(json& msg)
         }
     }
 
-    char data[1024];
+    char data[8096];
     long long total = 0;
     long long lastTotal = 0;
     long long lastTime = 0;
@@ -589,12 +589,12 @@ void usage(const char* cmd)
 
 int main(int argc, char* argv[])
 {
-    //rtc::InitLogger(rtc::LogLevel::Debug);
-    rtc::InitLogger(rtc::LogLevel::Error);
+    rtc::InitLogger(rtc::LogLevel::Verbose);
+    // rtc::InitLogger(rtc::LogLevel::Error);
     //std::string wsUrl = "ws://localhost:8080/ws";
-    std::string stunHost = "39.106.141.70";
-    uint16_t stunPort = 8347;
-    std::string wsUrl = "ws://39.106.141.70:6180/ws";
+    std::string stunHost = "47.236.146.120";
+    uint16_t stunPort = 3478;
+    std::string wsUrl = "ws://47.254.38.179:9380/ws";
     std::vector<std::string> args;
     for (int i = 1; i < argc; ++i) {
         const char* a = argv[i];
