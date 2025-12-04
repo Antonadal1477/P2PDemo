@@ -594,14 +594,14 @@ int main(int argc, char* argv[])
     rtc::InitLogger(rtc::LogLevel::Verbose);
     // rtc::InitLogger(rtc::LogLevel::Error);
     //std::string wsUrl = "ws://localhost:8080/ws";
-    rtc::SctpSettings s{
-        .recvBufferSize = 10 * 1024 * 1024,
-        .sendBufferSize = 10 * 1024 * 1024,
-        .maxBurst = 20,
-        .delayedSackTime = std::chrono::milliseconds(5),
-        .maxRetransmitAttempts = 5,
-    };
-    rtc::SetSctpSettings(s);
+    // rtc::SctpSettings s{
+    //     .recvBufferSize = 10 * 1024 * 1024,
+    //     .sendBufferSize = 10 * 1024 * 1024,
+    //     .maxBurst = 20,
+    //     .delayedSackTime = std::chrono::milliseconds(5),
+    //     .maxRetransmitAttempts = 5,
+    // };
+    // rtc::SetSctpSettings(s);
     std::string stunHost = "47.236.146.120";
     uint16_t stunPort = 3478;
     std::string wsUrl = "ws://8.215.63.116:9226/ws";
